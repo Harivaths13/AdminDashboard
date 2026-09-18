@@ -1,0 +1,100 @@
+﻿@model AdminDashboard.Models.DashboardViewModel
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<div class="flex items-center justify-between mb-6">
+    <h1 class="text-2xl font-bold text-gray-800">Dashboard</h1>
+    <div class="text-xs text-gray-500">
+        <span class="text-blue-600 hover:underline cursor-pointer">Home</span> / Dashboard v1
+    </div>
+</div>
+
+<!-- 4 AdminLTE Metric Cards -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+
+    <!-- New Orders -->
+    <div class="bg-cyan-600 rounded shadow text-white flex flex-col justify-between overflow-hidden relative">
+        <div class="p-4 flex justify-between items-start">
+            <div>
+                <h3 class="text-3xl font-bold">@Model.NewOrders</h3>
+                <p class="text-xs opacity-90 mt-1">New Orders</p>
+            </div>
+            <i data-lucide="shopping-bag" class="w-12 h-12 text-white/20 absolute right-3 top-3"></i>
+        </div>
+        <a href="#" class="bg-cyan-700/60 hover:bg-cyan-700/90 py-1 px-4 text-xs flex items-center justify-center gap-1 transition">
+            More info <i data-lucide="arrow-right-circle" class="w-3.5 h-3.5"></i>
+        </a>
+    </div>
+
+    <!-- Bounce Rate -->
+    <div class="bg-emerald-600 rounded shadow text-white flex flex-col justify-between overflow-hidden relative">
+        <div class="p-4 flex justify-between items-start">
+            <div>
+                <h3 class="text-3xl font-bold">@Model.BounceRate<sup class="text-lg font-medium">%</sup></h3>
+                <p class="text-xs opacity-90 mt-1">Bounce Rate</p>
+            </div>
+            <i data-lucide="bar-chart-2" class="w-12 h-12 text-white/20 absolute right-3 top-3"></i>
+        </div>
+        <a href="#" class="bg-emerald-700/60 hover:bg-emerald-700/90 py-1 px-4 text-xs flex items-center justify-center gap-1 transition">
+            More info <i data-lucide="arrow-right-circle" class="w-3.5 h-3.5"></i>
+        </a>
+    </div>
+
+    <!-- User Registrations -->
+    <div class="bg-amber-500 rounded shadow text-white flex flex-col justify-between overflow-hidden relative">
+        <div class="p-4 flex justify-between items-start">
+            <div>
+                <h3 class="text-3xl font-bold">@Model.UserRegistrations</h3>
+                <p class="text-xs opacity-90 mt-1">User Registrations</p>
+            </div>
+            <i data-lucide="user-plus" class="w-12 h-12 text-white/20 absolute right-3 top-3"></i>
+        </div>
+        <a href="#" class="bg-amber-600/60 hover:bg-amber-600/90 py-1 px-4 text-xs flex items-center justify-center gap-1 transition">
+            More info <i data-lucide="arrow-right-circle" class="w-3.5 h-3.5"></i>
+        </a>
+    </div>
+
+    <!-- Unique Visitors -->
+    <div class="bg-rose-600 rounded shadow text-white flex flex-col justify-between overflow-hidden relative">
+        <div class="p-4 flex justify-between items-start">
+            <div>
+                <h3 class="text-3xl font-bold">@Model.UniqueVisitors</h3>
+                <p class="text-xs opacity-90 mt-1">Unique Visitors</p>
+            </div>
+            <i data-lucide="pie-chart" class="w-12 h-12 text-white/20 absolute right-3 top-3"></i>
+        </div>
+        <a href="#" class="bg-rose-700/60 hover:bg-rose-700/90 py-1 px-4 text-xs flex items-center justify-center gap-1 transition">
+            More info <i data-lucide="arrow-right-circle" class="w-3.5 h-3.5"></i>
+        </a>
+    </div>
+</div>
+
+<!-- Chart & Map Placeholders -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div class="bg-white rounded border border-gray-200 shadow-sm p-4">
+        <div class="flex justify-between items-center pb-3 border-b border-gray-100">
+            <h2 class="font-semibold text-gray-700 flex items-center gap-2 text-sm">
+                <i data-lucide="trending-up" class="w-4 h-4 text-gray-500"></i> Sales
+            </h2>
+            <div class="flex gap-1">
+                <button class="bg-blue-600 text-white text-xs px-2.5 py-1 rounded shadow-sm">Area</button>
+                <button class="border border-gray-300 text-gray-600 text-xs px-2.5 py-1 rounded hover:bg-gray-50">Donut</button>
+            </div>
+        </div>
+        <div class="h-64 flex items-center justify-center text-gray-400 text-sm italic">
+            Sales Chart Area
+        </div>
+    </div>
+
+    <div class="bg-blue-500 rounded border border-blue-600 shadow-sm p-4 text-white">
+        <div class="flex justify-between items-center pb-3 border-b border-blue-400/50">
+            <h2 class="font-semibold flex items-center gap-2 text-sm">
+                <i data-lucide="map-pin" class="w-4 h-4"></i> Visitors
+            </h2>
+        </div>
+        <div class="h-64 flex items-center justify-center text-blue-100 text-sm italic">
+            Visitors Map Container
+        </div>
+    </div>
+</div>
