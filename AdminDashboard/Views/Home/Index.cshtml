@@ -13,12 +13,12 @@
 <!-- 4 AdminLTE Metric Cards -->
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
 
-    <!-- New Orders -->
+    <!-- New Orders / Products -->
     <div class="bg-cyan-600 rounded shadow text-white flex flex-col justify-between overflow-hidden relative">
         <div class="p-4 flex justify-between items-start">
             <div>
                 <h3 class="text-3xl font-bold">@Model.NewOrders</h3>
-                <p class="text-xs opacity-90 mt-1">New Orders</p>
+                <p class="text-xs opacity-90 mt-1">Total Products</p>
             </div>
             <i data-lucide="shopping-bag" class="w-12 h-12 text-white/20 absolute right-3 top-3"></i>
         </div>
@@ -71,7 +71,7 @@
 </div>
 
 <!-- Chart & Map Placeholders -->
-<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
     <div class="bg-white rounded border border-gray-200 shadow-sm p-4">
         <div class="flex justify-between items-center pb-3 border-b border-gray-100">
             <h2 class="font-semibold text-gray-700 flex items-center gap-2 text-sm">
@@ -96,5 +96,50 @@
         <div class="h-64 flex items-center justify-center text-blue-100 text-sm italic">
             Visitors Map Container
         </div>
+    </div>
+</div>
+
+<!-- Products Inventory Table -->
+<div class="bg-white rounded border border-gray-200 shadow-sm overflow-hidden">
+    <div class="px-5 py-3 border-b border-gray-100 flex items-center justify-between">
+        <h3 class="font-semibold text-gray-800 text-sm flex items-center gap-2">
+            <i data-lucide="box" class="w-4 h-4 text-gray-500"></i> Product Inventory
+        </h3>
+        <span class="text-xs bg-emerald-50 text-emerald-700 px-2.5 py-0.5 rounded-full font-medium border border-emerald-200">
+            Live from Database
+        </span>
+    </div>
+
+    <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse text-sm">
+            <thead class="bg-gray-50 text-gray-500 text-xs font-semibold uppercase tracking-wider border-b border-gray-100">
+                <tr>
+                    <th class="py-3 px-5">ID</th>
+                    <th class="py-3 px-5">Product Name</th>
+                    <th class="py-3 px-5">Price</th>
+                    <th class="py-3 px-5">Stock</th>
+                    <th class="py-3 px-5">Date Added</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+                @if (ViewBag.Products != null)
+                {
+                    foreach (var item in (List<AdminDashboard.Models.Product>)ViewBag.Products)
+                    {
+                        <tr class="hover:bg-gray-50 transition">
+                            <td class="py-3 px-5 font-semibold text-gray-900">#@item.Id</td>
+                            <td class="py-3 px-5 text-gray-700 font-medium">@item.Name</td>
+                            <td class="py-3 px-5 font-medium text-gray-900">$@item.Price.ToString("F2")</td>
+                            <td class="py-3 px-5">
+                                <span class="px-2.5 py-0.5 text-xs rounded-full font-medium @(item.StockQuantity > 20 ? "bg-emerald-100 text-emerald-700" : "bg-rose-100 text-rose-700")">
+                                    @item.StockQuantity in stock
+                                </span>
+                            </td>
+                            <td class="py-3 px-5 text-gray-500 text-xs">@item.CreatedAt.ToString("MMM dd, yyyy")</td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
     </div>
 </div>

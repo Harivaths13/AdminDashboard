@@ -1,36 +1,59 @@
-using AdminDashboard.Models;
-using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using AdminDashboard.Models;
 
-namespace AdminDashboard.Controllers
+namespace AdminDashboard.Controllers;
+
+public class HomeController : Controller
 {
-    public class HomeController : Controller
+    private readonly ApplicationDBContext _context;
+
+    public HomeController(ApplicationDBContext context)
     {
-        public IActionResult Index()
-        {
-            var model = new DashboardViewModel();
-            return View(model);
-        }
+        _context = context;
+    }
 
-        public IActionResult Widgets()
-{
-    return View();
-}
+    public async Task<IActionResult> Index()
+    {
+        var totalProducts = await _context.Products.CountAsync();
+        var productList = await _context.Products.ToListAsync();
 
-public IActionResult Charts()
-        {
-            return View();
-        }
+        ViewBag.Products = productList;
 
-        public IActionResult Tables()
+        var model = new DashboardViewModel
         {
-            return View();
-        }
+            NewOrders = totalProducts, // displaying product count
+            BounceRate = 12,
+            UserRegistrations = 44,
+            UniqueVisitors = 65
+        };
 
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
+        return View(model);
+    }
+
+    // --- ADDED METHOD HERE ---
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> CreateProduct(Product product)
+    {
+        if (ModelState.IsValid)
         {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            product.CreatedAt = DateTime.UtcNow;
+            _context.Products.Add(product);
+            await _context.SaveChangesAsync();
         }
+        return RedirectToAction(nameof(Index));
+    }
+    // -------------------------
+
+    public IActionResult Widgets() => View();
+    public IActionResult Charts() => View();
+    public IActionResult Tables() => View();
+
+    [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+    public IActionResult Error()
+    {
+        return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
     }
 }
