@@ -13,3 +13,8 @@
 
 * **Update:** Implemented `ProductsApiController` with endpoints to retrieve live JSON product data (`/api/productsapi`) and export database records as a downloadable `.json` file (`/api/productsapi/download`).
 * **UI:** Added an "Export JSON" button with responsive Tailwind styling directly to the inventory table header.
+### October 01, 2026
+
+* **Update:** Implemented `POST` (`/api/productsapi`) and `DELETE` (`/api/productsapi/{id}`) endpoints in `ProductsApiController` for full RESTful product lifecycle management.
+* **UI:** Integrated an interactive "Add Product" modal form and per-row delete action buttons with responsive Tailwind CSS styling directly on the dashboard inventory table.
+* **Database:** Verified manual SQL item insertion directly into LocalDB and resolved Razor layout script rendering.
