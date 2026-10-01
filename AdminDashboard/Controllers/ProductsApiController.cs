@@ -7,19 +7,18 @@ using System.Text;
 namespace AdminDashboard.Controllers;
 
 [ApiController]
+[IgnoreAntiforgeryToken]
 [Route("api/[controller]")]
 public class ProductsApiController : ControllerBase
 {
     private readonly ApplicationDBContext _context;
 
-    // 1. Dependency Injection: Visual Studio injects your SQL Server DB context
     public ProductsApiController(ApplicationDBContext context)
     {
         _context = context;
     }
 
-    // 2. View JSON in browser/API consumer
-    // URL: GET /api/productsapi
+    // GET: api/productsapi
     [HttpGet]
     public async Task<ActionResult<IEnumerable<Product>>> GetAllProducts()
     {
@@ -27,23 +26,78 @@ public class ProductsApiController : ControllerBase
         return Ok(products);
     }
 
-    // 3. Download JSON directly as a file
-    // URL: GET /api/productsapi/download
+    // GET: api/productsapi/download
     [HttpGet("download")]
     public async Task<IActionResult> DownloadJson()
     {
-        // Fetch all products from SQL Server
         var products = await _context.Products.AsNoTracking().ToListAsync();
-
-        // Convert the C# list into indented, readable JSON text
         var jsonOptions = new JsonSerializerOptions { WriteIndented = true };
         string jsonString = JsonSerializer.Serialize(products, jsonOptions);
-
-        // Convert the string into a byte array
         byte[] byteArray = Encoding.UTF8.GetBytes(jsonString);
-
-        // Prompt the user's browser to save the file
         string fileName = $"products_export_{DateTime.UtcNow:yyyyMMdd_HHmmss}.json";
         return File(byteArray, "application/json", fileName);
     }
+
+    // POST: api/productsapi
+    [HttpPost]
+    public async Task<IActionResult> CreateProduct([FromBody] ProductCreateDto dto)
+    {
+        if (dto == null)
+        {
+            return BadRequest(new { message = "Invalid product data received." });
+        }
+
+        if (string.IsNullOrWhiteSpace(dto.Name))
+        {
+            return BadRequest(new { message = "Product name is required." });
+        }
+
+        if (dto.Price < 0 || dto.StockQuantity < 0)
+        {
+            return BadRequest(new { message = "Price and stock quantity must be zero or positive." });
+        }
+
+        try
+        {
+            var product = new Product
+            {
+                Name = dto.Name.Trim(),
+                Price = dto.Price,
+                StockQuantity = dto.StockQuantity,
+                CreatedAt = DateTime.UtcNow
+            };
+
+            _context.Products.Add(product);
+            await _context.SaveChangesAsync();
+
+            return Ok(product);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { message = ex.InnerException?.Message ?? ex.Message });
+        }
+    }
+
+    // DELETE: api/productsapi/{id}
+    [HttpDelete("{id:int}")]
+    public async Task<IActionResult> DeleteProduct(int id)
+    {
+        var product = await _context.Products.FindAsync(id);
+        if (product == null)
+        {
+            return NotFound(new { message = $"Product with ID {id} was not found." });
+        }
+
+        _context.Products.Remove(product);
+        await _context.SaveChangesAsync();
+
+        return NoContent();
+    }
+}
+
+public class ProductCreateDto
+{
+    public string Name { get; set; } = string.Empty;
+    public decimal Price { get; set; }
+    public int StockQuantity { get; set; }
 }

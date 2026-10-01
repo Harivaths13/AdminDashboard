@@ -12,8 +12,7 @@
 
 <!-- 4 AdminLTE Metric Cards -->
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-
-    <!-- New Orders / Products -->
+    <!-- Total Products -->
     <div class="bg-cyan-600 rounded shadow text-white flex flex-col justify-between overflow-hidden relative">
         <div class="p-4 flex justify-between items-start">
             <div>
@@ -100,14 +99,25 @@
 </div>
 
 <!-- Products Inventory Table -->
-<div class="bg-white rounded border border-gray-200 shadow-sm overflow-hidden">
-    <div class="px-5 py-3 border-b border-gray-100 flex items-center justify-between">
+<div class="bg-white rounded border border-gray-200 shadow-sm overflow-hidden mb-6">
+    <div class="px-5 py-3 border-b border-gray-100 flex flex-wrap items-center justify-between gap-3">
         <h3 class="font-semibold text-gray-800 text-sm flex items-center gap-2">
             <i data-lucide="box" class="w-4 h-4 text-gray-500"></i> Product Inventory
         </h3>
-        <span class="text-xs bg-emerald-50 text-emerald-700 px-2.5 py-0.5 rounded-full font-medium border border-emerald-200">
-            Live from Database
-        </span>
+
+        <div class="flex items-center gap-2">
+            <span class="text-xs bg-emerald-50 text-emerald-700 px-2.5 py-0.5 rounded-full font-medium border border-emerald-200">
+                Live from Database
+            </span>
+            <a href="/api/productsapi/download"
+               class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium px-3 py-1.5 rounded flex items-center gap-1.5 transition shadow-sm">
+                <i data-lucide="download" class="w-3.5 h-3.5"></i> Export JSON
+            </a>
+            <button type="button" onclick="openCreateModal()"
+                    class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium px-3 py-1.5 rounded flex items-center gap-1.5 transition shadow-sm">
+                <i data-lucide="plus" class="w-3.5 h-3.5"></i> Add Product
+            </button>
+        </div>
     </div>
 
     <div class="overflow-x-auto">
@@ -119,6 +129,7 @@
                     <th class="py-3 px-5">Price</th>
                     <th class="py-3 px-5">Stock</th>
                     <th class="py-3 px-5">Date Added</th>
+                    <th class="py-3 px-5 text-right">Actions</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-gray-100">
@@ -126,7 +137,7 @@
                 {
                     foreach (var item in (List<AdminDashboard.Models.Product>)ViewBag.Products)
                     {
-                        <tr class="hover:bg-gray-50 transition">
+                        <tr id="product-row-@item.Id" class="hover:bg-gray-50 transition">
                             <td class="py-3 px-5 font-semibold text-gray-900">#@item.Id</td>
                             <td class="py-3 px-5 text-gray-700 font-medium">@item.Name</td>
                             <td class="py-3 px-5 font-medium text-gray-900">$@item.Price.ToString("F2")</td>
@@ -136,6 +147,13 @@
                                 </span>
                             </td>
                             <td class="py-3 px-5 text-gray-500 text-xs">@item.CreatedAt.ToString("MMM dd, yyyy")</td>
+                            <td class="py-3 px-5 text-right">
+                                <button type="button" onclick="deleteProduct(@item.Id, '@item.Name')"
+                                        title="Delete product"
+                                        class="text-red-500 hover:text-red-700 hover:bg-red-50 p-1.5 rounded transition">
+                                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                </button>
+                            </td>
                         </tr>
                     }
                 }
@@ -143,12 +161,142 @@
         </table>
     </div>
 </div>
-<div class="flex items-center gap-2">
-    <span class="text-xs bg-emerald-50 text-emerald-700 px-2.5 py-0.5 rounded-full font-medium border border-emerald-200">
-        Live from Database
-    </span>
-    <a href="/api/productsapi/download"
-       class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium px-3 py-1.5 rounded flex items-center gap-1.5 transition shadow-sm">
-        <i data-lucide="download" class="w-3.5 h-3.5"></i> Export JSON
-    </a>
+
+<!-- Create Product Modal -->
+<div id="createModal" class="fixed inset-0 bg-black/50 hidden z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-xl shadow-xl max-w-md w-full p-6 relative">
+        <div class="flex justify-between items-center pb-3 border-b border-gray-100">
+            <h3 class="text-base font-semibold text-gray-900">Add New Product</h3>
+            <button type="button" onclick="closeCreateModal()" class="text-gray-400 hover:text-gray-600">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+        </div>
+
+        <div class="space-y-4 mt-4">
+            <div>
+                <label class="block text-xs font-medium text-gray-700 mb-1">Product Name</label>
+                <input type="text" id="prodName" required placeholder="e.g. 4K Webcam"
+                       class="w-full text-sm border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <label class="block text-xs font-medium text-gray-700 mb-1">Price ($)</label>
+                    <input type="number" step="0.01" min="0" id="prodPrice" required placeholder="89.99"
+                           class="w-full text-sm border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-700 mb-1">Stock Quantity</label>
+                    <input type="number" min="0" id="prodStock" required placeholder="25"
+                           class="w-full text-sm border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                </div>
+            </div>
+
+            <div class="flex justify-end gap-2 pt-3">
+                <button type="button" onclick="closeCreateModal()"
+                        class="px-4 py-2 text-xs font-medium text-gray-600 hover:bg-gray-100 rounded-lg transition">
+                    Cancel
+                </button>
+                <button type="button" onclick="handleCreateProduct()"
+                        class="px-4 py-2 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition shadow-sm">
+                    Save Product
+                </button>
+            </div>
+        </div>
+    </div>
 </div>
+
+    <script>
+        function openCreateModal() {
+            var modal = document.getElementById('createModal');
+            if (modal) {
+                modal.classList.remove('hidden');
+            }
+        }
+
+        function closeCreateModal() {
+            var modal = document.getElementById('createModal');
+            if (modal) {
+                modal.classList.add('hidden');
+            }
+            document.getElementById('prodName').value = '';
+            document.getElementById('prodPrice').value = '';
+            document.getElementById('prodStock').value = '';
+        }
+
+        async function handleCreateProduct() {
+            const name = document.getElementById('prodName').value.trim();
+            const price = parseFloat(document.getElementById('prodPrice').value);
+            const stock = parseInt(document.getElementById('prodStock').value, 10);
+
+            if (!name) {
+                alert('Please enter a product name.');
+                return;
+            }
+            if (isNaN(price) || price < 0) {
+                alert('Please enter a valid price.');
+                return;
+            }
+            if (isNaN(stock) || stock < 0) {
+                alert('Please enter a valid stock quantity.');
+                return;
+            }
+
+            const payload = {
+                Name: name,
+                Price: price,
+                StockQuantity: stock
+            };
+
+            try {
+                const response = await fetch('/api/productsapi', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                if (response.ok) {
+                    closeCreateModal();
+                    window.location.reload();
+                } else {
+                    const text = await response.text();
+                    alert('Server returned error: ' + text);
+                }
+            } catch (error) {
+                console.error('Fetch error:', error);
+                alert('Request failed: ' + error.message);
+            }
+        }
+
+        async function deleteProduct(id, name) {
+            if (!confirm('Are you sure you want to delete "' + name + '"?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/productsapi/' + id, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    const row = document.getElementById('product-row-' + id);
+                    if (row) {
+                        row.remove();
+                    }
+                } else {
+                    const err = await response.text();
+                    alert('Error deleting: ' + err);
+                }
+            } catch (error) {
+                console.error('Fetch error:', error);
+                alert('Failed to delete product.');
+            }
+        }
+
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+    </script>
