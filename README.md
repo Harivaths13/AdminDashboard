@@ -18,3 +18,8 @@
 * **Update:** Implemented `POST` (`/api/productsapi`) and `DELETE` (`/api/productsapi/{id}`) endpoints in `ProductsApiController` for full RESTful product lifecycle management.
 * **UI:** Integrated an interactive "Add Product" modal form and per-row delete action buttons with responsive Tailwind CSS styling directly on the dashboard inventory table.
 * **Database:** Verified manual SQL item insertion directly into LocalDB and resolved Razor layout script rendering.
+### October 04, 2026
+
+* **Bugfix:** Resolved modal viewport trapping caused by parent sidebar overflow and positioning contexts by enforcing fixed viewport dimensions and dynamic body reparenting.
+* **UI:** Added explicit pointer cursors and verified full DOM interaction for product creation and deletion triggers.
+* **Verification:** Confirmed end-to-end functionality of REST API product creation (`/api/productsapi`) from both browser DevTools and the frontend dashboard UI.
